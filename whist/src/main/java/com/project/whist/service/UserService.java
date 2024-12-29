@@ -15,6 +15,7 @@ import com.project.whist.vo.UserRequestVo;
 import com.project.whist.vo.UserTokenResponseVo;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
@@ -29,8 +30,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-
     private final UserLoginRepository userLoginRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserRequestVo findByUserId(Long userId) {
 
@@ -69,7 +70,7 @@ public class UserService {
     public void registerNewUser(UserRequestVo userRequestVo) {
         User user = User.builder()
                 .userName(userRequestVo.getUsername())
-                .password(userRequestVo.getPassword())
+                .password(passwordEncoder.encode(userRequestVo.getPassword())) // Hash the password
                 .email(userRequestVo.getEmail())
                 .build();
 
@@ -93,9 +94,9 @@ public class UserService {
 
     public UserTokenResponseVo validateUserCredentialsAndGenerateToken(UserRequestVo userRequestVo) {
 
-        User user = userRepository.findUser(userRequestVo.getUsername(), userRequestVo.getPassword());
+        User user = userRepository.findUserByName(userRequestVo.getUsername());
 
-        if( user != null) {
+        if (user != null && passwordEncoder.matches(userRequestVo.getPassword(), user.getPassword())) { // Verify the hashed password
 
             String token = createJsonWebToken(userRequestVo.getUsername());
 
@@ -112,9 +113,10 @@ public class UserService {
 
             return userTokenResponseVo;
         } else {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException("Invalid username or password");
         }
     }
+
 
 
     public UserAuthorizeResponseVo authorizeV1(UserRequestVo userRequestVo) throws ParseException {
