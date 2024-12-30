@@ -1,4 +1,4 @@
-package com.project.whist.vo;
+package com.project.whist.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAuthorizeResponseVo {
+public class UserTokenResponseDto {
     private String username;
-    private boolean isValid;
+    private String token;
 }

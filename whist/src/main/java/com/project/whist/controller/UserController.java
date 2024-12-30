@@ -2,9 +2,10 @@
 package com.project.whist.controller;
 
 import com.project.whist.service.UserService;
-import com.project.whist.vo.UserAuthorizeResponseVo;
-import com.project.whist.vo.UserRequestVo;
-import com.project.whist.vo.UserTokenResponseVo;
+import com.project.whist.dto.UserAuthorizeResponseDto;
+import com.project.whist.dto.UserRequestDto;
+import com.project.whist.dto.UserTokenResponseDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,44 +20,44 @@ import java.util.List;
 
 
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/user/{userId}")
     @CrossOrigin
-    public UserRequestVo getUserById(@PathVariable Long userId) {
+    public UserRequestDto getUserById(@PathVariable Long userId) {
         return userService.findByUserId(userId);
     }
 
     @GetMapping("/user/all")
     @CrossOrigin
-    public List<UserRequestVo> getUsers() {
+    public List<UserRequestDto> getUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/user")
     @CrossOrigin
-    public List<UserRequestVo> getUsersNameContains(@RequestParam String name) {
+    public List<UserRequestDto> getUsersNameContains(@RequestParam String name) {
         return userService.getUsersNameContains(name);
     }
 
     @PostMapping("/user/register")
     @CrossOrigin
-    public void registerNewUser(@RequestBody UserRequestVo userRequestVo) {
-        userService.registerNewUser(userRequestVo);
+    public void registerNewUser(@RequestBody UserRequestDto userRequestDto) {
+        userService.registerNewUser(userRequestDto);
     }
 
     @PostMapping("/user/authenticate")
     @CrossOrigin
-    public UserTokenResponseVo login(@RequestBody UserRequestVo userRequestVo) {
-        return userService.validateUserCredentialsAndGenerateToken(userRequestVo);
+    public UserTokenResponseDto login(@RequestBody UserRequestDto userRequestDto) {
+        return userService.validateUserCredentialsAndGenerateToken(userRequestDto);
     }
 
     @PostMapping("/user/authorize")
     @CrossOrigin
-    public UserAuthorizeResponseVo authorize(@RequestBody UserRequestVo userRequestVo) throws ParseException {
-        return userService.authorizeV1(userRequestVo);
+    public UserAuthorizeResponseDto authorize(@RequestBody UserRequestDto userRequestDto) throws ParseException {
+        return userService.authorizeV1(userRequestDto);
     }
 }
