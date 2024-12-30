@@ -106,3 +106,22 @@ CREATE TABLE Bid (
     tricks_won INTEGER DEFAULT 0
 );
 ```
+
+```SQL 
+CREATE TABLE Card (
+    id SERIAL PRIMARY KEY,
+    suit VARCHAR(50) NOT NULL,
+    value VARCHAR(50) NOT NULL
+);
+```
+
+Populate the Card table:
+
+```SQL 
+INSERT INTO Card (suit, value) VALUES 
+('Hearts', '7'), ('Hearts', '8'), ('Hearts', '9'), ('Hearts', '10'), ('Hearts', 'J'), ('Hearts', 'Q'), ('Hearts', 'K'), ('Hearts', 'A'),
+('Diamonds', '7'), ('Diamonds', '8'), ('Diamonds', '9'), ('Diamonds', '10'), ('Diamonds', 'J'), ('Diamonds', 'Q'), ('Diamonds', 'K'), ('Diamonds', 'A'),
+('Clubs', '7'), ('Clubs', '8'), ('Clubs', '9'), ('Clubs', '10'), ('Clubs', 'J'), ('Clubs', 'Q'), ('Clubs', 'K'), ('Clubs', 'A'),
+('Spades', '7'), ('Spades', '8'), ('Spades', '9'), ('Spades', '10'), ('Spades', 'J'), ('Spades', 'Q'), ('Spades', 'K'), ('Spades', 'A');
+```
+
