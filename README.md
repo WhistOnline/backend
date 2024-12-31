@@ -24,7 +24,12 @@ SQL Table Creation Scripts
     user_id SERIAL PRIMARY KEY,
     user_name varchar(255),
     email varchar(255),
-    password varchar(255)
+    password varchar(255),
+    wins INTEGER DEFAULT 0,
+    losses INTEGER DEFAULT 0,
+    draws INTEGER DEFAULT 0,
+    total_games INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 
@@ -33,24 +38,6 @@ CREATE TABLE user_login (
     user_id INTEGER REFERENCES users(user_id),
     token varchar(255),
     token_expire_time varchar(255)
-);
-
-
-INSERT INTO users (user_name , email , password)
-VALUES ('test', 'test@gmail.com', 'testPassword');
-```
-
-```SQL 
-CREATE TABLE Player (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    wins INTEGER DEFAULT 0,
-    losses INTEGER DEFAULT 0,
-    draws INTEGER DEFAULT 0,
-    total_games INTEGER DEFAULT 0,
-    created_at TIMESTAMP DEFAULT NOW()
 );
 ```
 
