@@ -69,6 +69,7 @@ public class UserService {
                 .userName(userRequestDto.getUsername())
                 .password(passwordEncoder.encode(userRequestDto.getPassword())) // Hash the password
                 .email(userRequestDto.getEmail())
+                .createdAt(new Date().toInstant())
                 .build();
 
         userRepository.save(user);

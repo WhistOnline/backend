@@ -20,4 +20,29 @@ public class Card {
 
     @Column(nullable = false)
     private String value;
+
+
+    public Card() {}
+
+    public Card(String suit, String value) {
+        this.suit = suit;
+        this.value = value;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getSuit() {
+        return suit;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return value + " of " + suit;
+    }
 }

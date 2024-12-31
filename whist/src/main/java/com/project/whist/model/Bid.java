@@ -21,8 +21,8 @@ public class Bid {
     private Round round;
 
     @ManyToOne
-    @JoinColumn(name = "player_id")
-    private Player player;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private Integer bidValue;
     private Integer tricksWon;

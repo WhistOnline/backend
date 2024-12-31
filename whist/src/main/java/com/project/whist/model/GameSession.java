@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Entity
+@Entity(name = "game_session")
 public class GameSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class GameSession {
 
     @ManyToOne
     @JoinColumn(name = "winner_player_id")
-    private Player winner;
+    private User winner;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

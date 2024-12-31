@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Data
-@Entity
+@Entity(name = "round_move")
 public class RoundMove {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +21,13 @@ public class RoundMove {
     private Round round;
 
     @ManyToOne
-    @JoinColumn(name = "player_id")
-    private Player player;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String cardPlayed;
     private Integer moveOrder;
 
     @ManyToOne
     @JoinColumn(name = "trick_winner_id")
-    private Player trickWinner;
+    private User trickWinner;
 }
