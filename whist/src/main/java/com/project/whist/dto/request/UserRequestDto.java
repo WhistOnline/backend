@@ -1,4 +1,4 @@
-package com.project.whist.dto;
+package com.project.whist.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

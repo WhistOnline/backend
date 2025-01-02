@@ -2,11 +2,10 @@
 package com.project.whist.controller;
 
 import com.project.whist.service.UserService;
-import com.project.whist.dto.UserAuthorizeResponseDto;
-import com.project.whist.dto.UserRequestDto;
-import com.project.whist.dto.UserTokenResponseDto;
+import com.project.whist.dto.response.UserAuthorizeResponseDto;
+import com.project.whist.dto.request.UserRequestDto;
+import com.project.whist.dto.response.UserTokenResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

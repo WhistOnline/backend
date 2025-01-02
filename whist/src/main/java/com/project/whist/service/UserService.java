@@ -7,9 +7,9 @@ import com.project.whist.model.User;
 import com.project.whist.model.UserLogin;
 import com.project.whist.repository.UserLoginRepository;
 import com.project.whist.repository.UserRepository;
-import com.project.whist.dto.UserAuthorizeResponseDto;
-import com.project.whist.dto.UserRequestDto;
-import com.project.whist.dto.UserTokenResponseDto;
+import com.project.whist.dto.response.UserAuthorizeResponseDto;
+import com.project.whist.dto.request.UserRequestDto;
+import com.project.whist.dto.response.UserTokenResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -92,7 +92,7 @@ public class UserService {
 
     public UserTokenResponseDto validateUserCredentialsAndGenerateToken(UserRequestDto userRequestDto) {
 
-        User user = userRepository.findUserByName(userRequestDto.getUsername());
+        User user = userRepository.findUserByUsername(userRequestDto.getUsername());
 
         if (user != null && passwordEncoder.matches(userRequestDto.getPassword(), user.getPassword())) { // Verify the hashed password
 
