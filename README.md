@@ -8,7 +8,7 @@ CREATE ROLE whist LOGIN PASSWORD 'whist';
 REVOKE CONNECT ON DATABASE users  FROM PUBLIC;
 GRANT CONNECT on DATABASE users  TO whist;
 
-GRANT USAGE ON SCHEMA public TO new_user;
+GRANT USAGE ON SCHEMA public TO whist;
 
 GRANT ALL PRIVILEGES ON DATABASE users TO whist;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO whist;
@@ -47,7 +47,7 @@ CREATE TABLE GameSession (
     status VARCHAR(50) NOT NULL,
     max_players INTEGER NOT NULL,
     current_round INTEGER DEFAULT 0,
-    winner_player_id BIGINT REFERENCES Player(id),
+    winner_player_id BIGINT REFERENCES Users(id),
     created_at TIMESTAMP DEFAULT NOW()
 );
 ```
@@ -55,7 +55,7 @@ CREATE TABLE GameSession (
 ```SQL 
 CREATE TABLE GameSessionPlayer (
     id SERIAL PRIMARY KEY,
-    player_id BIGINT REFERENCES Player(id),
+    player_id BIGINT REFERENCES Users(id),
     game_session_id BIGINT REFERENCES GameSession(id),
     score INTEGER DEFAULT 0,
     is_dealer BOOLEAN DEFAULT FALSE
@@ -77,10 +77,10 @@ CREATE TABLE Round (
 CREATE TABLE RoundMove (
     id SERIAL PRIMARY KEY,
     round_id BIGINT REFERENCES Round(id),
-    player_id BIGINT REFERENCES Player(id),
+    player_id BIGINT REFERENCES Users(id),
     card_played VARCHAR(10) NOT NULL,
     move_order INTEGER NOT NULL,
-    trick_winner_id BIGINT REFERENCES Player(id)
+    trick_winner_id BIGINT REFERENCES Users(id)
 );
 ```
 
@@ -88,7 +88,7 @@ CREATE TABLE RoundMove (
 CREATE TABLE Bid (
     id SERIAL PRIMARY KEY,
     round_id BIGINT REFERENCES Round(id),
-    player_id BIGINT REFERENCES Player(id),
+    player_id BIGINT REFERENCES Users(id),
     bid_value INTEGER NOT NULL,
     tricks_won INTEGER DEFAULT 0
 );
