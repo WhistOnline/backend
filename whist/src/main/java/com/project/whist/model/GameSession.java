@@ -10,7 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
-import java.time.LocalDateTime;
+import lombok.ToString;
+
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -33,8 +35,9 @@ public class GameSession {
     private User winner;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @OneToMany(mappedBy = "gameSession", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<GameSessionPlayer> players;
 }

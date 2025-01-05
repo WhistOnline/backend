@@ -44,7 +44,7 @@ public class CardService {
             throw new IllegalArgumentException("Exactly 4 cards must be provided.");
         }
 
-        Card leadingCard = playedCards.get(0);
+        Card leadingCard = playedCards.getFirst();
         String leadingSuit = leadingCard.getSuit();
         String trumpSuit = (trumpCard != null) ? trumpCard.getSuit() : null;
 
