@@ -40,4 +40,6 @@ public class GameSession {
     @OneToMany(mappedBy = "gameSession", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<GameSessionPlayer> players;
+
+    private boolean isActive;
 }

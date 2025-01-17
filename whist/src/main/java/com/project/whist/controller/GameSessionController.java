@@ -28,12 +28,12 @@ public class GameSessionController {
     }
 
     @PostMapping("/join")
-    public GameSessionResponseDto joinGameSession(@RequestBody JoinGameSessionDto joinGameSessionDto) {
-        return gameSessionService.joinGameSession(joinGameSessionDto);
+    public GameSessionResponseDto joinGameSession(@RequestParam String username) {
+        return gameSessionService.joinGameSession(username);
     }
 
-    @GetMapping("/start")
-    public List<RoundResultDto> startGameSession(@RequestParam Long gameSessionId, @RequestBody RoundPlayDto roundPlayDto) {
-        return gameSessionService.playRound(gameSessionId, roundPlayDto);
-    }
+//    @GetMapping("/start")
+//    public List<RoundResultDto> startGameSession(@RequestParam Long gameSessionId, @RequestBody RoundPlayDto roundPlayDto) {
+//        return gameSessionService.playRound(gameSessionId, roundPlayDto);
+//    }
 }
