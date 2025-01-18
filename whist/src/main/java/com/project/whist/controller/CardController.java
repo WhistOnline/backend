@@ -1,19 +1,13 @@
 package com.project.whist.controller;
 
-import com.project.whist.dto.request.BidDto;
 import com.project.whist.dto.request.CardDto;
-import com.project.whist.model.Card;
 import com.project.whist.service.CardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/play-card")
+@RequestMapping("/card")
 public class CardController {
     private final CardService cardService;
 
