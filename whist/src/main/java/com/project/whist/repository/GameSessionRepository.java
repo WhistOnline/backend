@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface GameSessionRepository extends JpaRepository<GameSession, Long> {
 
-    Optional<GameSession> findByActive(boolean active);
+    Optional<GameSession> findByIsActive(boolean active);
 
+    Optional<GameSession> findByGameCode(String gameCode);
 }

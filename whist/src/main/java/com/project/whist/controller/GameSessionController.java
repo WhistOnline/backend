@@ -2,7 +2,9 @@ package com.project.whist.controller;
 
 import com.project.whist.dto.request.RoundPlayDto;
 import com.project.whist.dto.request.JoinGameSessionDto;
+import com.project.whist.dto.response.GameStateDto;
 import com.project.whist.dto.response.GameSessionResponseDto;
+import com.project.whist.dto.response.GameStateDto;
 import com.project.whist.dto.response.RoundResultDto;
 import com.project.whist.service.GameSessionService;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,13 @@ public class GameSessionController {
     }
 
     @PostMapping("/join")
-    public GameSessionResponseDto joinGameSession(@RequestParam String username) {
-        return gameSessionService.joinGameSession(username);
+    public GameSessionResponseDto joinGameSession(@RequestParam String username, @RequestParam String gameCode) {
+        return gameSessionService.joinGameSession(username, gameCode);
+    }
+
+    @GetMapping
+    public GameStateDto retrieveGame(@RequestParam String username, @RequestParam String gameCode) {
+        return gameSessionService.retrieveGame(username, gameCode);
     }
 
 //    @GetMapping("/start")

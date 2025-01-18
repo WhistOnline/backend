@@ -22,12 +22,15 @@ public class RoundMove {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+//    link to gameSessionPlayer instead
     private User user;
 
     private String cardPlayed;
+//    delete this
     private Integer moveOrder;
 
     @ManyToOne
     @JoinColumn(name = "trick_winner_id")
+//    link to gameSessionPlayer instead
     private User trickWinner;
 }

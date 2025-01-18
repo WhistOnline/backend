@@ -11,7 +11,6 @@ import jakarta.persistence.OneToMany;
 
 import lombok.Data;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Entity
@@ -27,8 +26,6 @@ public class Round {
     private Integer roundNumber;
     private String trumpSuit;
     private String type;
-    private Integer totalTricksWon;
-
 
     @OneToMany(mappedBy = "round", cascade = CascadeType.ALL)
     private List<RoundMove> moves;

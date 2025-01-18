@@ -42,4 +42,6 @@ public class GameSession {
     private List<GameSessionPlayer> players;
 
     private boolean isActive;
+
+    private String gameCode;
 }

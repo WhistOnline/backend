@@ -6,15 +6,7 @@ import com.project.whist.model.Card;
 import java.util.List;
 import java.util.Map;
 
-//public record GameDto(Long gameSessionId,
-//                      Integer roundNumber,
-//                      String trumpSuit,
-//                      Map<String, List<Card>> hands,
-//                      Map<String, List<Integer>> possibleMoves,
-//                      Integer playerCount) {
-//}
-
-public record GameDto(UserCardHandDto hand, List<Card> cardsPlayed, Card trumpCard, Map<String, Map<Integer, Integer>> scoreBoard) {
+public record GameStateDto(UserCardHandDto hand, List<Card> cardsPlayed, Card trumpCard, Map<String, Map<Integer, Integer>> scoreBoard) {
 }
 
 // GameStateDto retrieveGameState(String username); - method

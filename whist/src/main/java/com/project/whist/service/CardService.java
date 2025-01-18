@@ -39,6 +39,19 @@ public class CardService {
         return shuffledDeck;
     }
 
+    protected static List<Card> dealHand(List<Card> deck, int handSize) {
+        if (deck.size() < handSize) {
+            throw new IllegalArgumentException("Deck size must be at least the size of the hand.");
+        }
+
+        List<Card> hand = new ArrayList<>();
+        for (int i = 0; i < handSize; i++) {
+            hand.add(deck.removeFirst());
+        }
+
+        return hand;
+    }
+
     public static Card determineWinner(List<Card> playedCards, Card trumpCard) {
         if (playedCards.size() != 4) {
             throw new IllegalArgumentException("Exactly 4 cards must be provided.");

@@ -4,17 +4,16 @@ import com.project.whist.dto.request.CardDto;
 import com.project.whist.dto.request.RoundPlayDto;
 import com.project.whist.dto.request.JoinGameSessionDto;
 import com.project.whist.dto.request.UserCardHandDto;
+import com.project.whist.dto.response.GameStateDto;
 import com.project.whist.dto.response.GameSessionResponseDto;
+import com.project.whist.dto.response.GameStateDto;
 import com.project.whist.dto.response.RoundResultDto;
-import com.project.whist.model.GameSession;
-import com.project.whist.model.GameSessionPlayer;
-import com.project.whist.model.Round;
-import com.project.whist.model.RoundMove;
-import com.project.whist.model.User;
+import com.project.whist.model.*;
 import com.project.whist.repository.GameSessionPlayerRepository;
 import com.project.whist.repository.GameSessionRepository;
 import com.project.whist.repository.RoundRepository;
 import com.project.whist.repository.UserRepository;
+import com.project.whist.util.GameCodeGeneratorUtil;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.project.whist.util.GameCodeGeneratorUtil.generateGameCode;
 
 @Service
 @RequiredArgsConstructor
@@ -49,15 +50,18 @@ public class GameSessionService {
         gameSession.setMaxPlayers(4);
         gameSession.setCreatedAt(new Date().toInstant());
         gameSession.setActive(true);
+        gameSession.setGameCode(generateGameCode());
         gameSession = gameSessionRepository.save(gameSession);
         gameSessionPlayer.setGameSession(gameSession);
+        gameSessionPlayer.setIsDealer(true);
+        gameSessionPlayerRepository.save(gameSessionPlayer);
 
-        return new GameSessionResponseDto(gameSession.getId(), gameSession.getStatus(), gameSession.getMaxPlayers(), gameSession.getCreatedAt());
+        return new GameSessionResponseDto(gameSession.getId(), gameSession.getStatus(), gameSession.getMaxPlayers(), gameSession.getCreatedAt(), gameSession.getGameCode());
     }
 
     @Transactional
-    public GameSessionResponseDto joinGameSession(final String username) {
-        GameSession gameSession = gameSessionRepository.findByActive(true).orElseThrow();
+    public GameSessionResponseDto joinGameSession(final String username, final String gameCode) {
+        GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
         GameSessionPlayer gameSessionPlayer = gameSessionPlayerRepository.findByUsername(username);
         if (gameSessionPlayer == null) {
             gameSessionPlayer = new GameSessionPlayer();
@@ -68,7 +72,28 @@ public class GameSessionService {
         gameSession.getPlayers().add(gameSessionPlayer);
         gameSessionRepository.save(gameSession);
 
-        return new GameSessionResponseDto(gameSession.getId(), gameSession.getStatus(), gameSession.getMaxPlayers(), gameSession.getCreatedAt());
+        return new GameSessionResponseDto(gameSession.getId(), gameSession.getStatus(), gameSession.getMaxPlayers(), gameSession.getCreatedAt(), gameSession.getGameCode());
+    }
+
+    public GameStateDto retrieveGame(final String username, final String gameCode) {
+        GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
+
+        if (gameSession.getCurrentRound() == 0) {
+            gameSession.setCurrentRound(1);
+            gameSessionRepository.save(gameSession);
+        } else {
+            gameSession.setCurrentRound(gameSession.getCurrentRound() + 1);
+            gameSessionRepository.save(gameSession);
+        }
+
+        GameSessionPlayer gameSessionPlayer = gameSessionPlayerRepository.findByUsername(username);
+
+        UserCardHandDto hand = new UserCardHandDto(username, new ArrayList<>(), true);
+        List<Card> cardsPlayed = new ArrayList<>();
+        Card trumpCard = null;
+        Map<String, Map<Integer, Integer>> scoreBoard = new HashMap<>();
+
+        return new GameStateDto(hand, cardsPlayed, trumpCard, scoreBoard);
     }
 
 //    public List<RoundResultDto> playRound(final Long gameSessionId, final RoundPlayDto roundPlayDto) {
