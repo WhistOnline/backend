@@ -48,7 +48,6 @@ CREATE TABLE Game_Session (
     max_players INTEGER NOT NULL,
     current_round INTEGER DEFAULT 0,
     winner_player_id BIGINT REFERENCES users(id),
-    current_round INTEGER,
     is_active BOOLEAN,
     game_code VARCHAR(10),
     created_at TIMESTAMP DEFAULT NOW()
