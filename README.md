@@ -112,3 +112,21 @@ INSERT INTO Card (suit, value) VALUES
 ('Spades', '7'), ('Spades', '8'), ('Spades', '9'), ('Spades', '10'), ('Spades', 'J'), ('Spades', 'Q'), ('Spades', 'K'), ('Spades', 'A');
 ```
 
+1 1 1 1   2      3           4              5                6                     7                       8          
+1 2 3 4 (5 6) (7 8 9) (10 11 12 13) (14 15 16 17 18) (19 20 21 22 23 24) (25 26 27 28 29 30 31) (32 33 34 35 36 37 38 39)    
+1 2 3 4   5      6
+
+MAP <RoundNo, List<Integer>>
+1 -> List<Integer> = [1, 1, 1]
+2 -> [1, 1, 2]
+3 -> [1, 1, 3]
+4 -> [1, 1, 4]
+5 -> [2, 1, 5]
+6 -> [1, 0, 5]
+7 -> [3, 1, 6]
+8 -> [2, 0, 6]
+9 -> [1, 0, 6]
+10 -> [4, 1, 7]
+11 -> [3,                         0,                            7]
+       |                          |                             |
+no. of Cards in hand    should cards be dealt         actual round number

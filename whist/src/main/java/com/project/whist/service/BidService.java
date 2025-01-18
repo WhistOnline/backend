@@ -30,7 +30,6 @@ public class BidService {
 
         Integer roundNumber = gameSession.getCurrentRound();
         List<Integer> roundMap = getRoundDetails(roundNumber);
-
         Round round = roundRepository.findByGameSessionIdAndRoundNumber(gameSession.getId(), roundMap.get(2));
 
         Bid bid = new Bid();

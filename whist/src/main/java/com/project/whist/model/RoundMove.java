@@ -8,10 +8,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 import jakarta.persistence.OneToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity(name = "round_move")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class RoundMove {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,18 +28,14 @@ public class RoundMove {
     private Round round;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-//    link to gameSessionPlayer instead
-    private User user;
+    @JoinColumn(name = "game_session_player_id")
+    private GameSessionPlayer gameSessionPlayer;
 
     @OneToOne
     @JoinColumn(name = "card_id")
     private Card cardPlayed;
-//    delete this
-    private Integer moveOrder;
 
     @ManyToOne
     @JoinColumn(name = "trick_winner_id")
-//    link to gameSessionPlayer instead
-    private User trickWinner;
+    private GameSessionPlayer trickWinner;
 }

@@ -3,8 +3,9 @@ package com.project.whist.service;
 import com.project.whist.dto.RoundStart;
 import com.project.whist.dto.request.BidDto;
 import com.project.whist.dto.request.CardDto;
-import com.project.whist.model.Card;
-import com.project.whist.repository.CardRepository;
+import com.project.whist.model.*;
+import com.project.whist.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -14,17 +15,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.project.whist.util.RoundMappingUtil.getRoundDetails;
+
 @Service
+@RequiredArgsConstructor
 public class CardService {
     private static List<Card> deck;
 
     private static final List<String> VALUES = Arrays.asList("7", "8", "9", "10", "J", "Q", "K", "A");
 
     private final CardRepository cardRepository;
-
-    public CardService(CardRepository cardRepository) {
-        this.cardRepository = cardRepository;
-    }
+    private final GameSessionRepository gameSessionRepository;
+    private final GameSessionPlayerRepository gameSessionPlayerRepository;
+    private final RoundRepository roundRepository;
+    private final RoundMoveRepository roundMoveRepository;
 
     @PostConstruct
     public void initializeDeck() {
@@ -93,7 +97,32 @@ public class CardService {
         return Integer.compare(VALUES.indexOf(value1), VALUES.indexOf(value2));
     }
 
-    public BidDto playCard(String username, String gameCode, CardDto card) {
-        return null;
+    public CardDto playCard(String username, String gameCode, CardDto cardDto) {
+        GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
+        GameSessionPlayer gameSessionPlayer = gameSessionPlayerRepository.findByUsername(username);
+
+        Integer roundNumber = gameSession.getCurrentRound();
+        List<Integer> roundMap = getRoundDetails(roundNumber);
+        Round round = roundRepository.findByGameSessionIdAndRoundNumber(gameSession.getId(), roundMap.get(2));
+
+        Card card = cardRepository.findByValueAndSuit(cardDto.value(), cardDto.suit()).orElseThrow();
+
+        RoundMove roundMove = RoundMove.builder()
+                .round(round)
+                .gameSessionPlayer(gameSessionPlayer)
+                .cardPlayed(card)
+                .trickWinner(null)
+                .build();
+
+        roundMoveRepository.save(roundMove);
+
+        if (round.getMoves() == null) {
+            round.setMoves(new ArrayList<>());
+        }
+        round.getMoves().add(roundMove);
+
+        roundRepository.save(round);
+
+        return new CardDto(roundMove.getCardPlayed().getValue(), roundMove.getCardPlayed().getSuit());
     }
 }
