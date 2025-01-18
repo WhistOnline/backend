@@ -1,6 +1,8 @@
 package com.project.whist.service;
 
 import com.project.whist.dto.RoundStart;
+import com.project.whist.dto.request.BidDto;
+import com.project.whist.dto.request.CardDto;
 import com.project.whist.model.Card;
 import com.project.whist.repository.CardRepository;
 import org.springframework.stereotype.Service;
@@ -89,5 +91,9 @@ public class CardService {
 
     private static int compareValues(String value1, String value2) {
         return Integer.compare(VALUES.indexOf(value1), VALUES.indexOf(value2));
+    }
+
+    public BidDto playCard(String username, String gameCode, CardDto card) {
+        return null;
     }
 }
