@@ -78,21 +78,14 @@ public class CardService {
 
         Card card = cardRepository.findByValueAndSuit(cardDto.value(), cardDto.suit()).orElseThrow();
 
+        gameSessionPlayer.getCards().remove(card);
+
         RoundMove roundMove = RoundMove.builder()
                 .round(round)
                 .gameSessionPlayer(gameSessionPlayer)
                 .cardPlayed(card)
                 .trickWinner(null)
                 .build();
-
-        if (round.getMoves() == null) {
-            round.setMoves(new ArrayList<>());
-        }
-        round.getMoves().add(roundMove);
-
-        gameSessionPlayer.getCards().remove(card);
-
-        roundRepository.save(round);
 
         roundMoveRepository.save(roundMove);
 

@@ -32,7 +32,6 @@ public class RoundMove {
     private GameSessionPlayer gameSessionPlayer;
 
     @OneToOne
-    @JoinColumn(name = "card_id")
     private Card cardPlayed;
 
     @ManyToOne

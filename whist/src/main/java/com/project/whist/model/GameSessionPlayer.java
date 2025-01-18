@@ -29,7 +29,6 @@ public class GameSessionPlayer {
     private GameSession gameSession;
 
     @OneToMany
-    @JoinColumn(name = "card_id")
     private List<Card> cards;
 
     private Integer score;
