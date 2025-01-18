@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Data
@@ -25,7 +26,9 @@ public class RoundMove {
 //    link to gameSessionPlayer instead
     private User user;
 
-    private String cardPlayed;
+    @OneToOne
+    @JoinColumn(name = "card_id")
+    private Card cardPlayed;
 //    delete this
     private Integer moveOrder;
 

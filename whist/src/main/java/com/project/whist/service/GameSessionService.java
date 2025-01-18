@@ -1,5 +1,6 @@
 package com.project.whist.service;
 
+import com.project.whist.dto.RoundStart;
 import com.project.whist.dto.request.CardDto;
 import com.project.whist.dto.request.RoundPlayDto;
 import com.project.whist.dto.request.JoinGameSessionDto;
@@ -8,6 +9,7 @@ import com.project.whist.dto.response.GameStateDto;
 import com.project.whist.dto.response.GameSessionResponseDto;
 import com.project.whist.dto.response.GameStateDto;
 import com.project.whist.dto.response.RoundResultDto;
+import com.project.whist.dto.response.ScoreboardDto;
 import com.project.whist.model.*;
 import com.project.whist.repository.GameSessionPlayerRepository;
 import com.project.whist.repository.GameSessionRepository;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.project.whist.util.GameCodeGeneratorUtil.generateGameCode;
+import static com.project.whist.util.RoundMappingUtil.getRoundDetails;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class GameSessionService {
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
     private final GameSessionPlayerRepository gameSessionPlayerRepository;
+    private final RoundService roundService;
 
     @Transactional
     public GameSessionResponseDto createGameSession(final String username) {
@@ -75,10 +79,12 @@ public class GameSessionService {
         return new GameSessionResponseDto(gameSession.getId(), gameSession.getStatus(), gameSession.getMaxPlayers(), gameSession.getCreatedAt(), gameSession.getGameCode());
     }
 
-    public GameStateDto retrieveGame(final String username, final String gameCode) {
+    public GameStateDto retrieveGameState(final String username, final String gameCode) {
         GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
+        int currentHand = gameSession.getCurrentRound();
 
-        if (gameSession.getCurrentRound() == 0) {
+        if (currentHand == 0) {
+            currentHand = 1;
             gameSession.setCurrentRound(1);
             gameSessionRepository.save(gameSession);
         } else {
@@ -86,14 +92,35 @@ public class GameSessionService {
             gameSessionRepository.save(gameSession);
         }
 
+        List<Integer> roundMap = getRoundDetails(currentHand);
+        Map<String, List<Card>> hands = new HashMap<>();
+
+        if (roundMap.get(1) == 1) {
+            RoundStart roundStart = CardService.dealHand(roundMap.getFirst(), gameSession.getPlayers().size());
+            Round round = new Round();
+            round.setGameSession(gameSession);
+            round.setRoundNumber(roundMap.get(2));
+            round.setTrumpCard(roundStart.trumpCard());
+            roundRepository.save(round);
+
+            for (int i = 0; i < gameSession.getMaxPlayers(); i++) {
+                gameSession.getPlayers().get(i).setCards(roundStart.hands().get(i));
+                gameSessionPlayerRepository.save(gameSession.getPlayers().get(i));
+                hands.put(gameSession.getPlayers().get(i).getUser().getUserName(), roundStart.hands().get(i));
+            }
+        }
+
+        Round round = roundRepository.findByGameSessionIdAndRoundNumber(gameSession.getId(), roundMap.get(2));
+
         GameSessionPlayer gameSessionPlayer = gameSessionPlayerRepository.findByUsername(username);
 
-        UserCardHandDto hand = new UserCardHandDto(username, new ArrayList<>(), true);
-        List<Card> cardsPlayed = new ArrayList<>();
-        Card trumpCard = null;
+        List<RoundMove> currentTrickMoves = roundService.getLastIncompleteTrick(round.getMoves());
+
+        UserCardHandDto hand = new UserCardHandDto(username, CardDto.fromEntityList(hands.get(username)) , gameSessionPlayer.getIsDealer());
         Map<String, Map<Integer, Integer>> scoreBoard = new HashMap<>();
 
-        return new GameStateDto(hand, cardsPlayed, trumpCard, scoreBoard);
+        return new GameStateDto(hand, CardDto.fromRoundMoveList(currentTrickMoves), CardDto.fromEntity(round.getTrumpCard()), scoreBoard);
+
     }
 
 //    public List<RoundResultDto> playRound(final Long gameSessionId, final RoundPlayDto roundPlayDto) {

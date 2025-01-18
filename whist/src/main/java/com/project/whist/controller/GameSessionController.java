@@ -35,8 +35,8 @@ public class GameSessionController {
     }
 
     @GetMapping
-    public GameStateDto retrieveGame(@RequestParam String username, @RequestParam String gameCode) {
-        return gameSessionService.retrieveGame(username, gameCode);
+    public GameStateDto retrieveGameState(@RequestParam String username, @RequestParam String gameCode) {
+        return gameSessionService.retrieveGameState(username, gameCode);
     }
 
 //    @GetMapping("/start")

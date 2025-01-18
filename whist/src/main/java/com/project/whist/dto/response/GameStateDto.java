@@ -1,12 +1,12 @@
 package com.project.whist.dto.response;
 
+import com.project.whist.dto.request.CardDto;
 import com.project.whist.dto.request.UserCardHandDto;
-import com.project.whist.model.Card;
 
 import java.util.List;
 import java.util.Map;
 
-public record GameStateDto(UserCardHandDto hand, List<Card> cardsPlayed, Card trumpCard, Map<String, Map<Integer, Integer>> scoreBoard) {
+public record GameStateDto(UserCardHandDto hand, List<CardDto> cardsPlayed, CardDto trumpCard, Map<String, Map<Integer, Integer>> scoreBoard) {
 }
 
 // GameStateDto retrieveGameState(String username); - method

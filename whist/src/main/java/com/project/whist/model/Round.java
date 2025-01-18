@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
+import jakarta.persistence.OneToOne;
 import lombok.Data;
 import java.util.List;
 
@@ -24,7 +25,11 @@ public class Round {
     private GameSession gameSession;
 
     private Integer roundNumber;
-    private String trumpSuit;
+
+    @OneToOne
+    @JoinColumn(name = "trump_suit_id")
+    private Card trumpCard;
+
     private String type;
 
     @OneToMany(mappedBy = "round", cascade = CascadeType.ALL)

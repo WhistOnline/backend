@@ -1,5 +1,6 @@
 package com.project.whist.service;
 
+import com.project.whist.dto.RoundStart;
 import com.project.whist.model.Card;
 import com.project.whist.repository.CardRepository;
 import org.springframework.stereotype.Service;
@@ -39,17 +40,23 @@ public class CardService {
         return shuffledDeck;
     }
 
-    protected static List<Card> dealHand(List<Card> deck, int handSize) {
+    protected static RoundStart dealHand(int handSize, int playerCount) {
         if (deck.size() < handSize) {
             throw new IllegalArgumentException("Deck size must be at least the size of the hand.");
         }
 
-        List<Card> hand = new ArrayList<>();
-        for (int i = 0; i < handSize; i++) {
-            hand.add(deck.removeFirst());
+        List<Card> shuffledDeck = shuffledDeck();
+
+        List<List<Card>> hands = new ArrayList<>();
+        for (int i = 0; i < playerCount; i++) {
+            List<Card> hand = new ArrayList<>();
+            for (int j = 0; j < handSize; j++) {
+                hand.add(shuffledDeck.removeFirst());
+            }
+            hands.add(hand);
         }
 
-        return hand;
+        return new RoundStart(hands, shuffledDeck.getFirst());
     }
 
     public static Card determineWinner(List<Card> playedCards, Card trumpCard) {
