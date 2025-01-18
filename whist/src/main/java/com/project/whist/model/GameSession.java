@@ -44,4 +44,6 @@ public class GameSession {
     private boolean isActive;
 
     private String gameCode;
+
+    private Integer moveOrder;
 }

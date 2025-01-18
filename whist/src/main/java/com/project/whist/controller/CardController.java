@@ -6,6 +6,7 @@ import com.project.whist.model.Card;
 import com.project.whist.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +18,7 @@ public class CardController {
     private final CardService cardService;
 
     @PostMapping
-    public CardDto playCard(@RequestParam String username, @RequestParam String gameCode, @RequestParam CardDto card) {
+    public CardDto playCard(@RequestParam String username, @RequestParam String gameCode, @RequestBody CardDto card) {
         return cardService.playCard(username, gameCode, card);
     }
 }

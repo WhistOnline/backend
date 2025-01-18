@@ -55,6 +55,7 @@ public class GameSessionService {
         gameSessionPlayer.setUser(user);
 
         gameSession.setPlayers(new ArrayList<>(List.of(gameSessionPlayer)));
+        gameSession.setMoveOrder(0);
         gameSession.setStatus("joining");
         gameSession.setMaxPlayers(4);
         gameSession.setCreatedAt(new Date().toInstant());

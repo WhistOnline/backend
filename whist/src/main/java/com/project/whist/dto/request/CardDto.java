@@ -13,7 +13,7 @@ public record CardDto(String value, String suit, Boolean isValid) {
         boolean hasTrumpSuit = false;
 
         switch ((leadCard != null ? 1 : 0) + (trumpCard != null ? 2 : 0)) {
-            case 0:
+            case 0, 2:
                 return cards.stream()
                         .map(card -> new CardDto(card.getValue(), card.getSuit(), true))
                         .toList();
@@ -28,15 +28,6 @@ public record CardDto(String value, String suit, Boolean isValid) {
                                 card.getSuit().equals(leadCard.suit()) || !finalHasLeadSuit))
                         .toList();
 
-            case 2:
-                hasTrumpSuit = cards.stream().anyMatch(card -> card.getSuit().equals(trumpCard.suit()));
-                boolean finalHasTrumpSuit = hasTrumpSuit;
-                return cards.stream()
-                        .map(card -> new CardDto(
-                                card.getValue(),
-                                card.getSuit(),
-                                card.getSuit().equals(trumpCard.suit()) || !finalHasTrumpSuit))
-                        .toList();
 
             case 3:
                 hasLeadSuit = cards.stream().anyMatch(card -> card.getSuit().equals(leadCard.suit()));
