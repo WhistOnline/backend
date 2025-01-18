@@ -118,11 +118,14 @@ public class GameSessionService {
         GameSessionPlayer gameSessionPlayer = gameSessionPlayerOptional.orElseThrow();
 
         List<RoundMove> currentTrickMoves = roundService.getLastIncompleteTrick(round.getMoves());
+        List<CardDto> cardsPlayed = CardDto.fromRoundMoveList(currentTrickMoves);
+        CardDto trumpCard = CardDto.fromEntity(round.getTrumpCard());
+        CardDto leadingCard = cardsPlayed.isEmpty() ? null : cardsPlayed.getFirst();
 
         return new GameStateDto(
-                new UserCardHandDto(username, CardDto.fromEntityList(gameSessionPlayer.getCards()) , gameSessionPlayer.getIsTurn()),
-                CardDto.fromRoundMoveList(currentTrickMoves),
-                CardDto.fromEntity(round.getTrumpCard()),
+                new UserCardHandDto(username, CardDto.fromEntityListWithValidation(gameSessionPlayer.getCards(), leadingCard, trumpCard), gameSessionPlayer.getIsTurn()),
+                cardsPlayed,
+                trumpCard,
                 computeScoreboard(gameSession)
         );
 

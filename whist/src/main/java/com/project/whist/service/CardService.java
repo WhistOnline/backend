@@ -98,6 +98,6 @@ public class CardService {
 
         roundMoveRepository.save(roundMove);
 
-        return new CardDto(roundMove.getCardPlayed().getValue(), roundMove.getCardPlayed().getSuit());
+        return new CardDto(roundMove.getCardPlayed().getValue(), roundMove.getCardPlayed().getSuit(), null);
     }
 }
