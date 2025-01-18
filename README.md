@@ -21,8 +21,8 @@ SQL Table Creation Scripts
  
  ```SQL
  CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
-    user_name varchar(255),
+    id SERIAL PRIMARY KEY,
+    username varchar(255),
     email varchar(255),
     password varchar(255),
     wins INTEGER DEFAULT 0,
@@ -34,63 +34,44 @@ SQL Table Creation Scripts
 
 
 CREATE TABLE user_login (
-    user_login_id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(user_id),
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
     token varchar(255),
     token_expire_time varchar(255)
 );
 ```
 
 ```SQL 
-CREATE TABLE GameSession (
+CREATE TABLE Game_Session (
     id SERIAL PRIMARY KEY,
     status VARCHAR(50) NOT NULL,
     max_players INTEGER NOT NULL,
     current_round INTEGER DEFAULT 0,
-    winner_player_id BIGINT REFERENCES Users(id),
+    winner_player_id BIGINT REFERENCES users(id),
+    current_round INTEGER,
+    is_active BOOLEAN,
+    game_code VARCHAR(10),
     created_at TIMESTAMP DEFAULT NOW()
 );
 ```
 
 ```SQL 
-CREATE TABLE GameSessionPlayer (
+CREATE TABLE Game_Session_Player (
     id SERIAL PRIMARY KEY,
-    player_id BIGINT REFERENCES Users(id),
-    game_session_id BIGINT REFERENCES GameSession(id),
+    user_id BIGINT REFERENCES Users(id),
+    game_session_id BIGINT REFERENCES Game_Session(id),
     score INTEGER DEFAULT 0,
-    is_dealer BOOLEAN DEFAULT FALSE
+    is_turn BOOLEAN DEFAULT FALSE
 );
 ```
 
 ```SQL 
 CREATE TABLE Round (
     id SERIAL PRIMARY KEY,
-    game_session_id BIGINT REFERENCES GameSession(id),
+    game_session_id BIGINT REFERENCES Game_Session(id),
     round_number INTEGER NOT NULL,
     trump_suit VARCHAR(50),
-    type VARCHAR(50),
-    total_tricks_won INTEGER DEFAULT 0
-);
-```
-
-```SQL 
-CREATE TABLE RoundMove (
-    id SERIAL PRIMARY KEY,
-    round_id BIGINT REFERENCES Round(id),
-    player_id BIGINT REFERENCES Users(id),
-    card_played VARCHAR(10) NOT NULL,
-    move_order INTEGER NOT NULL,
-    trick_winner_id BIGINT REFERENCES Users(id)
-);
-```
-
-```SQL 
-CREATE TABLE Bid (
-    id SERIAL PRIMARY KEY,
-    round_id BIGINT REFERENCES Round(id),
-    player_id BIGINT REFERENCES Users(id),
-    bid_value INTEGER NOT NULL,
-    tricks_won INTEGER DEFAULT 0
+    type VARCHAR(50)
 );
 ```
 
@@ -99,6 +80,26 @@ CREATE TABLE Card (
     id SERIAL PRIMARY KEY,
     suit VARCHAR(50) NOT NULL,
     value VARCHAR(50) NOT NULL
+);
+```
+
+```SQL 
+CREATE TABLE RoundMove (
+    id SERIAL PRIMARY KEY,
+    round_id BIGINT REFERENCES Round(id),
+    player_id BIGINT REFERENCES Game_Session_Player(id),
+    card_played BIGINT REFERENCES Card(id),
+    trick_winner_id BIGINT REFERENCES Users(id)
+);
+```
+
+```SQL 
+CREATE TABLE Bid (
+    id SERIAL PRIMARY KEY,
+    round_id BIGINT REFERENCES Round(id),
+    player_id BIGINT REFERENCES Game_Session_Player(id),
+    bid_value INTEGER NOT NULL,
+    tricks_won INTEGER DEFAULT 0
 );
 ```
 
