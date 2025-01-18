@@ -5,9 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface RoundRepository extends JpaRepository<Round, Long> {
 
     @Query("SELECT r FROM Round r WHERE r.gameSession.id = :gameSessionId and r.roundNumber = :roundNumber")
     Round findByGameSessionIdAndRoundNumber(Long gameSessionId, Integer roundNumber);
+
+    List<Round> findByGameSessionId(Long gameSessionId);
 }

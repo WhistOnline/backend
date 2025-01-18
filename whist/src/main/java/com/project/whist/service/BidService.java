@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.project.whist.util.RoundMappingUtil.getRoundDetails;
 
@@ -26,7 +27,9 @@ public class BidService {
 
     public BidDto bid(String username, String gameCode, Integer bidValue) {
         GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
-        GameSessionPlayer gameSessionPlayer = gameSessionPlayerRepository.findByUsername(username);
+        Optional<GameSessionPlayer> gameSessionPlayerOptional = gameSessionPlayerRepository
+                .findGameSessionPlayerByGameSessionIdAndUsername(gameSession.getId(), username);
+        GameSessionPlayer gameSessionPlayer = gameSessionPlayerOptional.orElseThrow();
 
         Integer roundNumber = gameSession.getCurrentRound();
         List<Integer> roundMap = getRoundDetails(roundNumber);

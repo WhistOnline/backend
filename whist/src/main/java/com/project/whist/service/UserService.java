@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,10 +33,11 @@ public class UserService {
 
     public UserRequestDto findByUserId(Long userId) {
 
-        User user = userRepository.findByUserId(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
+        User user = userOptional.orElseThrow();
 
         return UserRequestDto.builder()
-                .username(user.getUserName())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .build();
     }
@@ -44,7 +46,7 @@ public class UserService {
 
         return userRepository.findAll().stream()
                 .map(user -> UserRequestDto.builder()
-                        .username(user.getUserName())
+                        .username(user.getUsername())
                         .email(user.getEmail())
                         .build())
                 .collect(Collectors.toList());
@@ -54,9 +56,9 @@ public class UserService {
     public List<UserRequestDto> getUsersNameContains(final String name) {
 
         return userRepository.findAll().stream()
-                .filter(user -> user.getUserName().contains(name))
+                .filter(user -> user.getUsername().contains(name))
                 .map(user -> UserRequestDto.builder()
-                        .username(user.getUserName())
+                        .username(user.getUsername())
                         .email(user.getEmail())
                         .build())
                 .collect(Collectors.toList());
@@ -66,7 +68,7 @@ public class UserService {
 
     public void registerNewUser(UserRequestDto userRequestDto) {
         User user = User.builder()
-                .userName(userRequestDto.getUsername())
+                .username(userRequestDto.getUsername())
                 .password(passwordEncoder.encode(userRequestDto.getPassword())) // Hash the password
                 .email(userRequestDto.getEmail())
                 .createdAt(new Date().toInstant())

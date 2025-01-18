@@ -6,7 +6,7 @@ import com.project.whist.dto.request.UserCardHandDto;
 import java.util.List;
 import java.util.Map;
 
-public record GameStateDto(UserCardHandDto hand, List<CardDto> cardsPlayed, CardDto trumpCard, Map<String, Map<Integer, Integer>> scoreBoard) {
+public record GameStateDto(UserCardHandDto hand, List<CardDto> cardsPlayed, CardDto trumpCard, ScoreboardDto scoreBoard) {
 }
 
 // GameStateDto retrieveGameState(String username); - method

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static com.project.whist.util.RoundMappingUtil.getRoundDetails;
 
@@ -47,11 +48,12 @@ public class CardService {
     }
 
     protected static RoundStart dealHand(int handSize, int playerCount) {
-        if (deck.size() < handSize) {
-            throw new IllegalArgumentException("Deck size must be at least the size of the hand.");
-        }
 
         List<Card> shuffledDeck = shuffledDeck();
+
+        if (shuffledDeck.size() < handSize) {
+            throw new IllegalArgumentException("Deck size must be at least the size of the hand.");
+        }
 
         List<List<Card>> hands = new ArrayList<>();
         for (int i = 0; i < playerCount; i++) {
@@ -65,41 +67,14 @@ public class CardService {
         return new RoundStart(hands, shuffledDeck.getFirst());
     }
 
-    public static Card determineWinner(List<Card> playedCards, Card trumpCard) {
-        if (playedCards.size() != 4) {
-            throw new IllegalArgumentException("Exactly 4 cards must be provided.");
-        }
-
-        Card leadingCard = playedCards.getFirst();
-        String leadingSuit = leadingCard.getSuit();
-        String trumpSuit = (trumpCard != null) ? trumpCard.getSuit() : null;
-
-        Card winner = leadingCard;
-
-        for (Card card : playedCards) {
-            if (card.getSuit().equals(trumpSuit)) {
-                // Trump suit beats all other suits
-                if (!winner.getSuit().equals(trumpSuit) || compareValues(card.getValue(), winner.getValue()) > 0) {
-                    winner = card;
-                }
-            } else if (card.getSuit().equals(leadingSuit)) {
-                // Compare values if the suits are the same as the leading suit
-                if (compareValues(card.getValue(), winner.getValue()) > 0) {
-                    winner = card;
-                }
-            }
-        }
-
-        return winner;
-    }
-
     private static int compareValues(String value1, String value2) {
         return Integer.compare(VALUES.indexOf(value1), VALUES.indexOf(value2));
     }
 
     public CardDto playCard(String username, String gameCode, CardDto cardDto) {
         GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
-        GameSessionPlayer gameSessionPlayer = gameSessionPlayerRepository.findByUsername(username);
+        Optional<GameSessionPlayer> gameSessionPlayerOptional = gameSessionPlayerRepository.findGameSessionPlayerByGameSessionIdAndUsername(gameSession.getId(), username);
+        GameSessionPlayer gameSessionPlayer = gameSessionPlayerOptional.orElseThrow();
 
         Integer roundNumber = gameSession.getCurrentRound();
         List<Integer> roundMap = getRoundDetails(roundNumber);
@@ -114,14 +89,14 @@ public class CardService {
                 .trickWinner(null)
                 .build();
 
-        roundMoveRepository.save(roundMove);
-
         if (round.getMoves() == null) {
             round.setMoves(new ArrayList<>());
         }
         round.getMoves().add(roundMove);
 
         roundRepository.save(round);
+
+        roundMoveRepository.save(roundMove);
 
         return new CardDto(roundMove.getCardPlayed().getValue(), roundMove.getCardPlayed().getSuit());
     }

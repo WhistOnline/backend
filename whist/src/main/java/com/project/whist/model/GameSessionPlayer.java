@@ -33,5 +33,5 @@ public class GameSessionPlayer {
     private List<Card> cards;
 
     private Integer score;
-    private Boolean isDealer;
+    private Boolean isTurn;
 }
