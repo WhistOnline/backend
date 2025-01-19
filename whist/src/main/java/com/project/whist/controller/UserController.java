@@ -1,6 +1,7 @@
 
 package com.project.whist.controller;
 
+import com.project.whist.dto.response.UserResponseDto;
 import com.project.whist.model.User;
 import com.project.whist.service.UserService;
 import com.project.whist.dto.response.UserAuthorizeResponseDto;
@@ -27,19 +28,19 @@ public class UserController {
 
     @GetMapping("/user/{userId}")
     @CrossOrigin
-    public User getUserById(@PathVariable Long userId) {
+    public UserResponseDto getUserById(@PathVariable Long userId) {
         return userService.findByUserId(userId);
     }
 
     @GetMapping("/user/all")
     @CrossOrigin
-    public List<User> getUsers() {
+    public List<UserResponseDto> getUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/user")
     @CrossOrigin
-    public List<User> getUsersNameContains(@RequestParam String name) {
+    public List<UserResponseDto> getUsersNameContains(@RequestParam String name) {
         return userService.getUsersNameContains(name);
     }
 

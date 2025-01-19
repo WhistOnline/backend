@@ -32,6 +32,8 @@ public class Round {
 
     private String type;
 
+    private Boolean isComplete;
+
     @OneToMany(mappedBy = "round", cascade = CascadeType.ALL)
     private List<RoundMove> moves;
 }

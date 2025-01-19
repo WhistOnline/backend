@@ -3,6 +3,7 @@ package com.project.whist.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.project.whist.dto.response.UserResponseDto;
 import com.project.whist.model.User;
 import com.project.whist.model.UserLogin;
 import com.project.whist.repository.UserLoginRepository;
@@ -31,55 +32,31 @@ public class UserService {
     private final UserLoginRepository userLoginRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User findByUserId(Long userId) {
+    public UserResponseDto findByUserId(Long userId) {
 
         Optional<User> userOptional = userRepository.findById(userId);
         User user = userOptional.orElseThrow();
-        return User.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .createdAt(user.getCreatedAt())
-                .draws(user.getDraws())
-                .losses(user.getLosses())
-                .totalGames(user.getTotalGames())
-                .wins(user.getWins())
-                .build();
+        return UserResponseDto.fromEntity(user);
     }
 
-    public List<User> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
 
         return userRepository.findAll().stream()
-                .map(user -> User.builder()
-                        .username(user.getUsername())
-                        .email(user.getEmail())
-                        .createdAt(user.getCreatedAt())
-                        .draws(user.getDraws())
-                        .losses(user.getLosses())
-                        .totalGames(user.getTotalGames())
-                        .wins(user.getWins())
-                        .build())
+                .map(UserResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public List<User> getUsersNameContains(final String name) {
+    public List<UserResponseDto> getUsersNameContains(final String name) {
 
         return userRepository.findAll().stream()
                 .filter(user -> user.getUsername().contains(name))
-                .map(user -> User.builder()
-                        .username(user.getUsername())
-                        .email(user.getEmail())
-                        .createdAt(user.getCreatedAt())
-                        .draws(user.getDraws())
-                        .losses(user.getLosses())
-                        .totalGames(user.getTotalGames())
-                        .wins(user.getWins())
-                        .build()).toList();
+                .map(UserResponseDto::fromEntity).toList();
     }
 
     public void registerNewUser(UserRequestDto userRequestDto) {
         User user = User.builder()
                 .username(userRequestDto.getUsername())
-                .password(passwordEncoder.encode(userRequestDto.getPassword())) // Hash the password
+                .password(passwordEncoder.encode(userRequestDto.getPassword()))
                 .email(userRequestDto.getEmail())
                 .createdAt(new Date().toInstant())
                 .build();
@@ -130,12 +107,10 @@ public class UserService {
     public UserAuthorizeResponseDto authorizeV1(UserRequestDto userRequestDto) throws ParseException {
         UserLogin userLogin = userLoginRepository.findByUserAndToken(userRequestDto.getUsername(), userRequestDto.getToken());
 
-        // check user-login in database
         if (userLogin != null) {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = format.parse(userLogin.getTokenExpireTime());
 
-            // check if token expired
             if (new Date().compareTo(date) <1) {
                 return new UserAuthorizeResponseDto(userRequestDto.getUsername(), true);
             } else {
