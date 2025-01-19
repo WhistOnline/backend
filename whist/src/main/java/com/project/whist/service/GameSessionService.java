@@ -106,16 +106,20 @@ public class GameSessionService {
                 gameSessionPlayerRepository.save(gameSession.getPlayers().get(i));
             }
 
-            GameSessionPlayer gameSessionPlayer = gameSession.getPlayers().stream().filter(GameSessionPlayer::getIsTurn).findFirst().get();
-            int previousPlayerIndex = gameSession.getPlayers().indexOf(gameSessionPlayer);
-            int currentPlayerIndex = (previousPlayerIndex + 1) % gameSession.getPlayers().size();
-            gameSession.getPlayers().get(previousPlayerIndex).setIsTurn(false);
-            gameSession.getPlayers().get(currentPlayerIndex).setIsTurn(true);
-            gameSession.setMoveOrder(currentPlayerIndex);
+            if (roundMap.get(2) != 1) {
+                GameSessionPlayer gameSessionPlayer = gameSession.getPlayers().stream().filter(GameSessionPlayer::getIsTurn).findFirst().get();
+                int previousPlayerIndex = gameSession.getPlayers().indexOf(gameSessionPlayer);
+                int currentPlayerIndex = (previousPlayerIndex + 1) % gameSession.getPlayers().size();
+                gameSession.getPlayers().get(previousPlayerIndex).setIsTurn(false);
+                gameSession.getPlayers().get(currentPlayerIndex).setIsTurn(true);
+                gameSession.setMoveOrder(currentPlayerIndex);
+            }
 
             Round previousRound = roundRepository.findByGameSessionIdAndRoundNumber(gameSession.getId(), roundMap.get(2) - 1);
-            previousRound.setIsComplete(true);
-            roundRepository.save(previousRound);
+            if (previousRound != null) {
+                previousRound.setIsComplete(true);
+                roundRepository.save(previousRound);
+            }
         }
 
         Optional<GameSessionPlayer> gameSessionPlayerOptional = gameSessionPlayerRepository
@@ -127,9 +131,13 @@ public class GameSessionService {
         CardDto trumpCard = CardDto.fromEntity(round.getTrumpCard());
         CardDto leadingCard = cardsPlayed.isEmpty() ? null : cardsPlayed.getFirst();
         boolean isPlayerTurn = gameSession.getPlayers().indexOf(gameSessionPlayer) == gameSession.getMoveOrder();
+        List<String> playerUsernameOrder = new ArrayList<>();
+        for (int i = 0; i < gameSession.getPlayers().size(); i++) {
+            playerUsernameOrder.add(gameSession.getPlayers().get((gameSession.getMoveOrder() + i) % gameSession.getPlayers().size()).getUser().getUsername());
+        }
 
         return new GameStateDto(
-                new UserCardHandDto(username, CardDto.fromEntityListWithValidation(gameSessionPlayer.getCards(), leadingCard, trumpCard), isPlayerTurn),
+                new UserCardHandDto(username, CardDto.fromEntityListWithValidation(gameSessionPlayer.getCards(), leadingCard, trumpCard), isPlayerTurn, playerUsernameOrder),
                 cardsPlayed,
                 trumpCard,
                 computeScoreboard(gameSession)
@@ -139,23 +147,21 @@ public class GameSessionService {
 
     private ScoreboardDto computeScoreboard(final GameSession gameSession) {
         List<UserScoreDto> userScores = new ArrayList<>();
-        List<Round> rounds = roundRepository.findByGameSessionId(gameSession.getId())
-                .stream()
-                .filter(Round::getIsComplete).toList();
+        List<Round> rounds = roundRepository.findByGameSessionId(gameSession.getId());
         gameSession.getPlayers().forEach(
                 player -> {
-                    int totalScore = 0;
+//                    int totalScore = 0;
                     List<ScoreDetailsDto> scoreDetails = new ArrayList<>();
                     for (Round round : rounds) {
-                        Bid bid = bidRepository.findByRoundIdAndGameSessionPlayerId(round.getId(), player.getUser().getId());
-                        if (Objects.equals(bid.getBidValue(), bid.getTricksWon())) {
-                            totalScore += 5 + bid.getBidValue();
-                        } else {
-                            totalScore -= Math.abs(bid.getBidValue() - bid.getTricksWon());
-                        }
-                        scoreDetails.add(new ScoreDetailsDto(round.getRoundNumber(), bid.getBidValue(), bid.getTricksWon()));
+                        Bid bid = bidRepository.findByRoundIdAndGameSessionPlayerId(round.getId(), player.getId());
+//                        if (Objects.equals(bid.getBidValue(), bid.getTricksWon())) {
+//                            totalScore += 5 + bid.getBidValue();
+//                        } else {
+//                            totalScore -= Math.abs(bid.getBidValue() - bid.getTricksWon());
+//                        }
+                        scoreDetails.add(new ScoreDetailsDto(round.getRoundNumber(), bid != null ? bid.getBidValue() : null, bid != null ? bid.getTricksWon() : null));
                     }
-                    userScores.add(new UserScoreDto(player.getUser().getUsername(), scoreDetails, totalScore));
+                    userScores.add(new UserScoreDto(player.getUser().getUsername(), scoreDetails));
                 }
         );
         return new ScoreboardDto(userScores);

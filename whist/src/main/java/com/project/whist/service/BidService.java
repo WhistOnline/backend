@@ -44,6 +44,9 @@ public class BidService {
 
         bidRepository.save(bid);
 
+        gameSession.setMoveOrder((gameSession.getMoveOrder() + 1) % 4);
+        gameSessionRepository.save(gameSession);
+
         return new BidDto(bid.getBidValue(), null);
     }
 

@@ -1,18 +1,11 @@
 package com.project.whist.service;
 
-import com.project.whist.dto.response.ScoreDetailsDto;
-import com.project.whist.dto.response.UserScoreDto;
-import com.project.whist.model.Bid;
-import com.project.whist.model.GameSession;
-import com.project.whist.model.Round;
 import com.project.whist.model.RoundMove;
 import com.project.whist.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
