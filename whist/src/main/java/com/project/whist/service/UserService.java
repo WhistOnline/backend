@@ -31,40 +31,50 @@ public class UserService {
     private final UserLoginRepository userLoginRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserRequestDto findByUserId(Long userId) {
+    public User findByUserId(Long userId) {
 
         Optional<User> userOptional = userRepository.findById(userId);
         User user = userOptional.orElseThrow();
-
-        return UserRequestDto.builder()
+        return User.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
+                .createdAt(user.getCreatedAt())
+                .draws(user.getDraws())
+                .losses(user.getLosses())
+                .totalGames(user.getTotalGames())
+                .wins(user.getWins())
                 .build();
     }
 
-    public List<UserRequestDto> getAllUsers() {
+    public List<User> getAllUsers() {
 
         return userRepository.findAll().stream()
-                .map(user -> UserRequestDto.builder()
+                .map(user -> User.builder()
                         .username(user.getUsername())
                         .email(user.getEmail())
+                        .createdAt(user.getCreatedAt())
+                        .draws(user.getDraws())
+                        .losses(user.getLosses())
+                        .totalGames(user.getTotalGames())
+                        .wins(user.getWins())
                         .build())
                 .collect(Collectors.toList());
-
     }
 
-    public List<UserRequestDto> getUsersNameContains(final String name) {
+    public List<User> getUsersNameContains(final String name) {
 
         return userRepository.findAll().stream()
                 .filter(user -> user.getUsername().contains(name))
-                .map(user -> UserRequestDto.builder()
+                .map(user -> User.builder()
                         .username(user.getUsername())
                         .email(user.getEmail())
-                        .build())
-                .collect(Collectors.toList());
-
+                        .createdAt(user.getCreatedAt())
+                        .draws(user.getDraws())
+                        .losses(user.getLosses())
+                        .totalGames(user.getTotalGames())
+                        .wins(user.getWins())
+                        .build()).toList();
     }
-
 
     public void registerNewUser(UserRequestDto userRequestDto) {
         User user = User.builder()
