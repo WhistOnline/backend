@@ -1,16 +1,18 @@
 package com.project.whist.service;
 
+import com.project.whist.dto.response.ScoreDetailsDto;
+import com.project.whist.dto.response.UserScoreDto;
+import com.project.whist.model.Bid;
+import com.project.whist.model.GameSession;
+import com.project.whist.model.Round;
 import com.project.whist.model.RoundMove;
-import com.project.whist.repository.GameSessionPlayerRepository;
-import com.project.whist.repository.GameSessionRepository;
-import com.project.whist.repository.RoundRepository;
-import com.project.whist.repository.UserRepository;
+import com.project.whist.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +22,7 @@ public class RoundService {
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
     private final GameSessionPlayerRepository gameSessionPlayerRepository;
+    private final BidRepository bidRepository;
 
     public List<RoundMove> getLastIncompleteTrick(List<RoundMove> moves) {
         if (moves == null || moves.isEmpty()) {

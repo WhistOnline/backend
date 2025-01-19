@@ -1,7 +1,6 @@
 package com.project.whist.service;
 
 import com.project.whist.dto.RoundStart;
-import com.project.whist.dto.request.BidDto;
 import com.project.whist.dto.request.CardDto;
 import com.project.whist.model.*;
 import com.project.whist.repository.*;
@@ -10,11 +9,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.project.whist.util.RoundMappingUtil.getRoundDetails;
 
@@ -30,6 +25,7 @@ public class CardService {
     private final GameSessionPlayerRepository gameSessionPlayerRepository;
     private final RoundRepository roundRepository;
     private final RoundMoveRepository roundMoveRepository;
+    private final BidRepository bidRepository;
 
     @PostConstruct
     public void initializeDeck() {
@@ -82,6 +78,8 @@ public class CardService {
 
         Card card = cardRepository.findByValueAndSuit(cardDto.value(), cardDto.suit()).orElseThrow();
 
+        gameSessionPlayer.getCards().remove(card);
+
         RoundMove roundMove = RoundMove.builder()
                 .round(round)
                 .gameSessionPlayer(gameSessionPlayer)
@@ -89,15 +87,65 @@ public class CardService {
                 .trickWinner(null)
                 .build();
 
-        if (round.getMoves() == null) {
-            round.setMoves(new ArrayList<>());
-        }
-        round.getMoves().add(roundMove);
-
-        roundRepository.save(round);
-
         roundMoveRepository.save(roundMove);
 
-        return new CardDto(roundMove.getCardPlayed().getValue(), roundMove.getCardPlayed().getSuit());
+        if (round.getMoves().size() % 4 == 0) {
+            int size = round.getMoves().size();
+            computeTrickWinner(gameCode, round, round.getMoves().subList(size - 4, size));
+        }
+
+        return new CardDto(roundMove.getCardPlayed().getValue(), roundMove.getCardPlayed().getSuit(), null);
+    }
+
+    public void computeTrickWinner(String gameCode, Round round, List<RoundMove> moves) {
+        GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
+        String leadSuit = moves.getFirst().getCardPlayed().getSuit();
+        String trumpSuit = round.getTrumpCard().getSuit();
+
+        RoundMove winningMove = moves.getFirst();
+        Card winningCard = winningMove.getCardPlayed();
+
+        for (RoundMove move : moves) {
+            Card currentCard = move.getCardPlayed();
+
+            if (isBetterCard(currentCard, winningCard, leadSuit, trumpSuit)) {
+                winningMove = move;
+                winningCard = currentCard;
+            }
+        }
+
+        GameSessionPlayer winningPlayer = winningMove.getGameSessionPlayer();
+        Bid bid = bidRepository.findByRoundIdAndGameSessionPlayerId(round.getId(), winningPlayer.getId());
+        if (bid.getTricksWon() == null) {
+            bid.setTricksWon(0);
+        }
+        bid.setTricksWon(bid.getTricksWon() + 1);
+
+        gameSession.setMoveOrder(gameSession.getPlayers().indexOf(winningPlayer));
+        gameSessionRepository.save(gameSession);
+    }
+
+    private boolean isBetterCard(Card card1, Card card2, String leadSuit, String trumpSuit) {
+        if (card1.getSuit().equals(trumpSuit) && !card2.getSuit().equals(trumpSuit)) {
+            return true;
+        }
+
+        if (card1.getSuit().equals(trumpSuit) && card2.getSuit().equals(trumpSuit)) {
+            return rankIndex(card1) > rankIndex(card2);
+        }
+
+        if (card1.getSuit().equals(leadSuit) && !card2.getSuit().equals(leadSuit)) {
+            return true;
+        }
+
+        if (card1.getSuit().equals(leadSuit) && card2.getSuit().equals(leadSuit)) {
+            return rankIndex(card1) > rankIndex(card2);
+        }
+
+        return false;
+    }
+
+    private int rankIndex(Card card) {
+        return VALUES.indexOf(card.getValue());
     }
 }

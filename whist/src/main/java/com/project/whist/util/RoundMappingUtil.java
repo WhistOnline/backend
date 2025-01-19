@@ -20,12 +20,12 @@ public class RoundMappingUtil {
 
         for (int handsInRound : handsPerRound) {
             isFirst = true;
+            cards = handsInRound;
             for (int i = 0; i < handsInRound; i++) {
-                ROUND_TO_CARD_MAP.put(round++, List.of(cards, isFirst ? 1 : 0, actualRound));
+                ROUND_TO_CARD_MAP.put(round++, List.of(cards--, isFirst ? 1 : 0, actualRound));
                 isFirst = false;
             }
             actualRound++;
-            cards = handsInRound;
         }
     }
 
