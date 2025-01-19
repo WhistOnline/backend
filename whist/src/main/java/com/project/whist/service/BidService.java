@@ -11,6 +11,7 @@ import com.project.whist.repository.GameSessionRepository;
 import com.project.whist.repository.RoundRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class BidService {
     private final GameSessionRepository gameSessionRepository;
     private final RoundRepository roundRepository;
 
+    @Transactional
     public BidDto bid(String username, String gameCode, Integer bidValue) {
         GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
         Optional<GameSessionPlayer> gameSessionPlayerOptional = gameSessionPlayerRepository
@@ -52,23 +54,14 @@ public class BidService {
 
     public List<Integer> availableBids(String gameCode, String username) {
         GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
-        Optional<GameSessionPlayer> gameSessionPlayerOptional = gameSessionPlayerRepository
-                .findGameSessionPlayerByGameSessionIdAndUsername(gameSession.getId(), username);
-
-        GameSessionPlayer gameSessionPlayer = gameSessionPlayerOptional.orElseThrow();
 
         Integer roundNumber = gameSession.getCurrentRound();
         List<Integer> roundMap = getRoundDetails(roundNumber);
         Round round = roundRepository.findByGameSessionIdAndRoundNumber(gameSession.getId(), roundMap.get(2));
 
-        int lastPlayerIndex;
-        if (gameSession.getMoveOrder() == 0) {
-            lastPlayerIndex = 3;
-        } else {
-            lastPlayerIndex = gameSession.getMoveOrder() - 1;
-        }
+        boolean isTheLastPlayerToBid = bidRepository.findByRoundId(round.getId()).size() == 3;
 
-        if (gameSession.getPlayers().indexOf(gameSessionPlayer) == lastPlayerIndex) {
+        if (isTheLastPlayerToBid) {
             ArrayList<Integer> availableBids = new ArrayList<>();
             List<Bid> bids = bidRepository.findByRoundId(round.getId());
 

@@ -108,7 +108,10 @@ public class GameSessionService {
 
             if (roundMap.get(2) != 1) {
                 GameSessionPlayer gameSessionPlayer = gameSession.getPlayers().stream().filter(GameSessionPlayer::getIsTurn).findFirst().get();
-                int previousPlayerIndex = gameSession.getPlayers().indexOf(gameSessionPlayer);
+                int previousPlayerIndex = gameSession.getPlayers().stream()
+                        .sorted((p1, p2) -> (int) (p1.getId() - p2.getId()))
+                        .toList()
+                        .indexOf(gameSessionPlayer);
                 int currentPlayerIndex = (previousPlayerIndex + 1) % gameSession.getPlayers().size();
                 gameSession.getPlayers().get(previousPlayerIndex).setIsTurn(false);
                 gameSession.getPlayers().get(currentPlayerIndex).setIsTurn(true);
@@ -130,10 +133,16 @@ public class GameSessionService {
         List<CardDto> cardsPlayed = CardDto.fromRoundMoveList(currentTrickMoves);
         CardDto trumpCard = CardDto.fromEntity(round.getTrumpCard());
         CardDto leadingCard = cardsPlayed.isEmpty() ? null : cardsPlayed.getFirst();
-        boolean isPlayerTurn = gameSession.getPlayers().indexOf(gameSessionPlayer) == gameSession.getMoveOrder();
+        boolean isPlayerTurn = gameSession.getPlayers().stream()
+                .sorted((p1, p2) -> (int) (p1.getId() - p2.getId()))
+                .toList()
+                .indexOf(gameSessionPlayer) == gameSession.getMoveOrder();
         List<String> playerUsernameOrder = new ArrayList<>();
-        for (int i = 0; i < gameSession.getPlayers().size(); i++) {
-            playerUsernameOrder.add(gameSession.getPlayers().get((gameSession.getMoveOrder() + i) % gameSession.getPlayers().size()).getUser().getUsername());
+        List<GameSessionPlayer> sortedPlayers = gameSession.getPlayers().stream()
+                .sorted((p1, p2) -> (int) (p1.getId() - p2.getId()))
+                .toList();
+        for (int i = 0; i < sortedPlayers.size(); i++) {
+            playerUsernameOrder.add(sortedPlayers.get((gameSession.getMoveOrder() + i) % sortedPlayers.size()).getUser().getUsername());
         }
 
         return new GameStateDto(

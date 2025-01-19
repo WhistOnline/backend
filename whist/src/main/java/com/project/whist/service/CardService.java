@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -67,6 +68,7 @@ public class CardService {
         return Integer.compare(VALUES.indexOf(value1), VALUES.indexOf(value2));
     }
 
+    @Transactional
     public CardDto playCard(String username, String gameCode, CardDto cardDto) {
         GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
         Optional<GameSessionPlayer> gameSessionPlayerOptional = gameSessionPlayerRepository.findGameSessionPlayerByGameSessionIdAndUsername(gameSession.getId(), username);
@@ -79,6 +81,7 @@ public class CardService {
         Card card = cardRepository.findByValueAndSuit(cardDto.value(), cardDto.suit()).orElseThrow();
 
         gameSessionPlayer.getCards().remove(card);
+        gameSessionPlayerRepository.save(gameSessionPlayer);
 
         RoundMove roundMove = RoundMove.builder()
                 .round(round)
@@ -91,8 +94,19 @@ public class CardService {
 
         if (round.getMoves().size() % 4 == 0) {
             int size = round.getMoves().size();
-            computeTrickWinner(gameCode, round, round.getMoves().subList(size - 4, size));
+            gameSession.setCurrentRound(gameSession.getCurrentRound() + 1);
+            gameSessionRepository.save(gameSession);
+            computeTrickWinner(
+                    gameCode,
+                    round,
+                    round.getMoves().subList(size - 4, size).stream()
+                            .sorted((m1, m2) -> (int) (m1.getId() - m2.getId()))
+                            .toList()
+            );
         }
+
+        gameSession.setMoveOrder((gameSession.getMoveOrder() + 1) % 4);
+        gameSessionRepository.save(gameSession);
 
         return new CardDto(roundMove.getCardPlayed().getValue(), roundMove.getCardPlayed().getSuit(), null);
     }
@@ -120,8 +134,12 @@ public class CardService {
             bid.setTricksWon(0);
         }
         bid.setTricksWon(bid.getTricksWon() + 1);
+        bidRepository.save(bid);
 
-        gameSession.setMoveOrder(gameSession.getPlayers().indexOf(winningPlayer));
+        gameSession.setMoveOrder(gameSession.getPlayers().stream()
+                .sorted((p1, p2) -> (int) (p1.getId() - p2.getId()))
+                .toList()
+                .indexOf(winningPlayer));
         gameSessionRepository.save(gameSession);
     }
 

@@ -48,7 +48,11 @@ public record CardDto(String value, String suit, Boolean isValid) {
     }
 
     public static List<CardDto> fromRoundMoveList(List<RoundMove> moves) {
-        return moves.stream().map(move -> new CardDto(move.getCardPlayed().getValue(), move.getCardPlayed().getSuit(), null)).toList();
+
+        return moves.stream()
+                .sorted((m1, m2) -> (int) (m1.getId() - m2.getId()))
+                .map(move -> new CardDto(move.getCardPlayed().getValue(), move.getCardPlayed().getSuit(), null))
+                .toList();
     }
 
     public static CardDto fromEntity(Card card) {
