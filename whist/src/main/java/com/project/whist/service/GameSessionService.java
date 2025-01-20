@@ -159,20 +159,22 @@ public class GameSessionService {
         List<Round> rounds = roundRepository.findByGameSessionId(gameSession.getId());
         gameSession.getPlayers().forEach(
                 player -> {
-//                    int totalScore = 0;
                     List<ScoreDetailsDto> scoreDetails = new ArrayList<>();
                     for (Round round : rounds) {
                         Bid bid = bidRepository.findByRoundIdAndGameSessionPlayerId(round.getId(), player.getId());
-//                        if (Objects.equals(bid.getBidValue(), bid.getTricksWon())) {
-//                            totalScore += 5 + bid.getBidValue();
-//                        } else {
-//                            totalScore -= Math.abs(bid.getBidValue() - bid.getTricksWon());
-//                        }
                         scoreDetails.add(new ScoreDetailsDto(round.getRoundNumber(), bid != null ? bid.getBidValue() : null, bid != null ? bid.getTricksWon() : null));
                     }
                     userScores.add(new UserScoreDto(player.getUser().getUsername(), scoreDetails));
                 }
         );
         return new ScoreboardDto(userScores);
+    }
+
+    public List<String> getJoinedPlayers(final String gameCode) {
+        GameSession gameSession = gameSessionRepository.findByGameCode(gameCode).orElseThrow();
+        return gameSession.getPlayers().stream()
+                .sorted((p1, p2) -> (int) (p1.getId() - p2.getId()))
+                .map(player -> player.getUser().getUsername())
+                .toList();
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/game-session")
@@ -30,5 +32,10 @@ public class GameSessionController {
     @GetMapping
     public GameStateDto retrieveGameState(@RequestParam String username, @RequestParam String gameCode) {
         return gameSessionService.retrieveGameState(username, gameCode);
+    }
+
+    @GetMapping("/ready")
+    public List<String> readyPlayers(@RequestParam String gameCode) {
+        return gameSessionService.getJoinedPlayers(gameCode);
     }
 }
